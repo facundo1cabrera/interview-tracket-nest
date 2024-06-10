@@ -4,15 +4,13 @@ export const dataSourceOptions: DataSourceOptions = {
     type: 'postgres',
     entities: ['dist/**/*.entity.js'],
     migrations: ['dist/db/migrations/*.js'],
-    host: process.env.DB_HOST,
-    port: +process.env.DB_PORT,
-    database: process.env.DB_NAME,
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
+    host: process.env.DB_HOST || 'localhost',
+    port: +process.env.DB_PORT || 5432,
+    database: process.env.DB_NAME || "interviewTracker",
+    username: process.env.DB_USERNAME || "postgres",
+    password: process.env.DB_PASSWORD || "asdfhasdfkjhasdfqwye8rudsaifnzxvnwrglkz",
     synchronize: false
 };
-
-console.log(process.env)
 
 const dataSource = new DataSource(dataSourceOptions);
 export default dataSource;

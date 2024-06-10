@@ -1,10 +1,11 @@
 
 
-export class UpdateProcessDto {
+export class GetProcessDto {
+    id: string;
     jobTitle: string;
     companyName: string;
     startDate: number;
-    finishDate?: string | null;
+    finishDate?: number | null;
     status: string;
     appliedBy?: string | null;
     jobDescription?: string | null;

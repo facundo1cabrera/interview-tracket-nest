@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/auth/entities/user.entity";
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Process {
@@ -6,23 +7,74 @@ export class Process {
     id: string;
 
     @Column()
-    title: string;
+    jobTitle: string;
 
     @Column()
     companyName: string;
 
     @Column()
-    started: Date;
+    startDate: Date;
+
+    @Column({
+        nullable: true
+    })
+    finishDate?: Date | null;
 
     @Column()
-    finishedAt: Date | null;
-
-    @Column()
-    status: 'Offer accepted' | 'Offer declined' | 'No offer received' | 'No response'
+    status: string;
     
-    @Column()
-    appliedBy: string;
+    @Column({
+        nullable: true
+    })
+    appliedBy?: string | null;
+
+    @Column({
+        nullable: true
+    })
+    jobDescription?: string | null;
+
+    @Column({
+        nullable: true
+    })
+    timeOff?: string | null;
+    
+    @Column({
+        nullable: true
+    })
+    salaryRange?: string | null;
+
+    @Column({
+        nullable: true
+    })
+    jobSchema?: string | null;
+    
+    @Column({
+        nullable: true
+    })
+    bonus?: string | null;
+
+    @Column({
+        nullable: true
+    })
+    techStack?: string | null;
+
+    @Column({
+        nullable: true
+    })
+    stockOptions?: string | null;
+
+    @Column({
+        nullable: true
+    })
+    location?: string;
 
     @Column()
-    jobDescription: string;
+    interviewsSteps: number;
+    // steps?: Step[]
+
+    @ManyToOne(() => User, (user) => user.processes)
+    user: User
+
+    @Column({type: "uuid"})
+    userId: string;
 }

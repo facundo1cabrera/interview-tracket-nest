@@ -1,17 +1,13 @@
 export class CreateProcessDto {
-    id: string;
-
-    title: string;
+    jobTitle: string;
 
     companyName: string;
-
-    started: Date;
-
-    finishedAt: Date | null;
-
-    status: 'Offer accepted' | 'Offer declined' | 'No offer received' | 'No response'
     
-    appliedBy: string;
+    appliedBy?: string;
 
-    jobDescription: string;
+    interviewsSteps: number;
+
+    jobDescription?: string;
+
+    userId: string;
 }

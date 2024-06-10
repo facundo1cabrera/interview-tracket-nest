@@ -1,30 +1,52 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UnauthorizedException, ForbiddenException, Put, BadRequestException } from '@nestjs/common';
 import { ProcessesService } from './processes.service';
 import { CreateProcessDto } from './dto/create-process.dto';
 import { UpdateProcessDto } from './dto/update-process.dto';
+import { Auth, GetUser } from 'src/auth/decorators';
+import { User } from 'src/auth/entities/user.entity';
 
 @Controller('processes')
 export class ProcessesController {
-  constructor(private readonly processesService: ProcessesService) {}
+  constructor(private readonly processesService: ProcessesService) { }
 
   @Post()
-  create(@Body() createProcessDto: CreateProcessDto) {
-    return this.processesService.create(createProcessDto);
+  @Auth()
+  async create(@Body() createProcessDto: CreateProcessDto,
+    @GetUser() user: User
+  ) {
+
+    if (createProcessDto.userId !== user.id)
+      throw new ForbiddenException();
+
+    return await this.processesService.create(createProcessDto);
   }
 
-  @Get()
-  findAll() {
-    return this.processesService.findAll();
+  @Put(":id")
+  @Auth()
+  async update(@Body() updateProcessDto: UpdateProcessDto,
+    @GetUser() user: User,
+    @Param('id') id: string
+  ) {
+    if (updateProcessDto.userId !== user.id)
+      throw new ForbiddenException();
+
+      return await this.processesService.update(id, updateProcessDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.processesService.findOne(+id);
+  @Get('byUser/:id')
+  @Auth()
+  findAll(@Param('id') id: string, @GetUser() user: User) {
+    if (id !== user.id)
+      throw new ForbiddenException();
+
+    return this.processesService.findAllByUserId(user.id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProcessDto: UpdateProcessDto) {
-    return this.processesService.update(+id, updateProcessDto);
+  @Get('detail/:id')
+  async findOne(@Param('id') id: string) {
+    if (!id)
+      throw new BadRequestException();
+    return await this.processesService.findOne(id);
   }
 
   @Delete(':id')
