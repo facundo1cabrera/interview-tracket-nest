@@ -1,4 +1,5 @@
 import { User } from "src/auth/entities/user.entity";
+import { Step } from "src/steps/entities/step.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -70,11 +71,13 @@ export class Process {
 
     @Column()
     interviewsSteps: number;
-    // steps?: Step[]
 
     @ManyToOne(() => User, (user) => user.processes)
     user: User
 
     @Column({type: "uuid"})
     userId: string;
+
+    @OneToMany(type => Step, step => step.process)
+    steps: Step[];
 }

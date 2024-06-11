@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProcessesModule } from './processes/processes.module';
 import { dataSourceOptions } from 'db/data-source';
 import { AuthModule } from './auth/auth.module';
+import { StepsModule } from './steps/steps.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -14,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
     TypeOrmModule.forRoot(dataSourceOptions),
     ProcessesModule,
     AuthModule,
+    StepsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

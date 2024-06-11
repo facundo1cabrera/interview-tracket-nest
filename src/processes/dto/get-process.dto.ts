@@ -18,4 +18,5 @@ export class GetProcessDto {
     location?: string;
     interviewsSteps: number;
     userId: string;
+    amountOfSteps: number;
 }
