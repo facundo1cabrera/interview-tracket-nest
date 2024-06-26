@@ -66,7 +66,9 @@ export class ProcessesService {
     })
 
     return {
-      metadata: 3,
+      metadata: {
+        size: count
+      },
       processes: processesDto
     };
   }
