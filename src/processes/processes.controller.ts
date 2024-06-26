@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UnauthorizedException, ForbiddenException, Put, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UnauthorizedException, ForbiddenException, Put, BadRequestException, Query } from '@nestjs/common';
 import { ProcessesService } from './processes.service';
 import { CreateProcessDto } from './dto/create-process.dto';
 import { UpdateProcessDto } from './dto/update-process.dto';
@@ -35,11 +35,11 @@ export class ProcessesController {
 
   @Get('byUser/:id')
   @Auth()
-  findAll(@Param('id') id: string, @GetUser() user: User) {
+  findAll(@Param('id') id: string, @GetUser() user: User, @Query('skip') skip: number = 0, @Query('take') take: number = 30) {
     if (id !== user.id)
       throw new ForbiddenException();
 
-    return this.processesService.findAllByUserId(user.id);
+    return this.processesService.findAllByUserId(user.id, skip, take);
   }
 
   @Get('detail/:id')

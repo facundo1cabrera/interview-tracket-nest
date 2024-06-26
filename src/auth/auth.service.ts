@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -25,13 +25,14 @@ export class AuthService {
       });
 
       await this.userRepository.save(user);
-      return user;
+      return {
+        email: user.email,  
+        id: user.id
+      }
     } catch (e) {
+      throw new BadRequestException("User already exists");
       console.log(e);
     }
-
-
-    return 'This action adds a new auth';
   }
 
   async login(loginUserDto: LoginUserDto) {
@@ -49,7 +50,8 @@ export class AuthService {
     if ( !bcrypt.compareSync( password, user.password ))
       throw new UnauthorizedException();
 
-    return { id: user.id, token: this.getJwtToken({ id: user.id })};
+    const currentDate = new Date();
+    return { id: user.id, token: this.getJwtToken({ id: user.id }), expiration: currentDate.setHours(currentDate.getHours() + 6)};
   }
 
   private getJwtToken( payload: JwtPayload ) {

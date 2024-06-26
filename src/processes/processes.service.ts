@@ -31,9 +31,14 @@ export class ProcessesService {
     return result.id;
   }
 
-  async findAllByUserId(id: string) {
-    const processes = await this.processesRepository.find({
-      where: { user: { id } }
+  async findAllByUserId(id: string, skip: number = 0, take: number = 30) {
+    const [processes, count] = await this.processesRepository.findAndCount({
+      where: { user: { id } },
+      relations: {
+        steps: true
+      },
+      skip,
+      take
     });
 
     const processesDto = processes.map(x => {
@@ -55,14 +60,18 @@ export class ProcessesService {
       newProcessDto.stockOptions = x.stockOptions;
       newProcessDto.techStack = x.techStack;
       newProcessDto.timeOff = x.timeOff;
+      newProcessDto.amountOfSteps = x.steps.length;
 
       return newProcessDto;
     })
 
-    return processesDto;
+    return {
+      metadata: 3,
+      processes: processesDto
+    };
   }
 
-  async findOne(id: string) {
+    async findOne(id: string) {
     const process = await this.processesRepository.findOneBy({ id });
 
     const newProcessDto = new GetProcessDto();
@@ -113,7 +122,12 @@ export class ProcessesService {
       updatedProcess
     );
 
-    const updatedProcessDb = await this.processesRepository.findOneBy({ id });
+    const updatedProcessDb = await this.processesRepository.findOne({
+      where: { id },
+      relations: {
+        steps: true
+      }
+    });
 
     const newProcessDto = new GetProcessDto();
     newProcessDto.id = updatedProcessDb.id;
@@ -133,6 +147,7 @@ export class ProcessesService {
     newProcessDto.stockOptions = updatedProcessDb.stockOptions;
     newProcessDto.techStack = updatedProcessDb.techStack;
     newProcessDto.timeOff = updatedProcessDb.timeOff;
+    newProcessDto.amountOfSteps = updatedProcessDb.steps.length;
 
     return newProcessDto;
   }
