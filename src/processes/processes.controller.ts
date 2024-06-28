@@ -4,6 +4,7 @@ import { CreateProcessDto } from './dto/create-process.dto';
 import { UpdateProcessDto } from './dto/update-process.dto';
 import { Auth, GetUser } from 'src/auth/decorators';
 import { User } from 'src/auth/entities/user.entity';
+import { SearchProcessDto } from './dto/search-process.dto';
 
 @Controller('processes')
 export class ProcessesController {
@@ -35,11 +36,17 @@ export class ProcessesController {
 
   @Get('byUser/:id')
   @Auth()
-  findAll(@Param('id') id: string, @GetUser() user: User, @Query('skip') skip: number = 0, @Query('take') take: number = 30) {
+  async findAll(@Param('id') id: string, @GetUser() user: User, @Query('skip') skip: number = 0, @Query('take') take: number = 30) {
     if (id !== user.id)
       throw new ForbiddenException();
 
-    return this.processesService.findAllByUserId(user.id, skip, take);
+    return await this.processesService.findAllByUserId(user.id, skip, take);
+  }
+
+  @Post('search')
+  @Auth()
+  async search(@Body() SearchProcessDto: SearchProcessDto, @GetUser() user: User, @Query('skip') skip: number = 0, @Query('take') take: number = 30) {
+    return await this.processesService.search(SearchProcessDto.search, user.id, skip, take);
   }
 
   @Get('detail/:id')

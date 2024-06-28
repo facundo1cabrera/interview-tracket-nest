@@ -3,7 +3,7 @@ import { CreateProcessDto } from './dto/create-process.dto';
 import { UpdateProcessDto } from './dto/update-process.dto';
 import { Process } from './entities/process.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { GetProcessDto } from './dto/get-process.dto';
 
 @Injectable()
@@ -73,7 +73,50 @@ export class ProcessesService {
     };
   }
 
-    async findOne(id: string) {
+  async search(search: string, userId: string, skip: number = 0, take: number = 30) {
+    const [processes, count] = await this.processesRepository.findAndCount({
+      where: { user: { id: userId }, companyName: ILike(`%${search}%`) },
+      skip,
+      take,
+      relations: {
+        steps: true
+      }
+    });
+
+    const processesDto = processes.map(x => {
+      const newProcessDto = new GetProcessDto();
+      newProcessDto.id = x.id;
+      newProcessDto.jobTitle = x.jobTitle;
+      newProcessDto.companyName = x.companyName;
+      newProcessDto.appliedBy = x.appliedBy;
+      newProcessDto.jobDescription = x.jobDescription;
+      newProcessDto.interviewsSteps = x.interviewsSteps;
+      newProcessDto.startDate = x.startDate.valueOf();
+      newProcessDto.status = x.status;
+      newProcessDto.userId = x.userId;
+      newProcessDto.finishDate = x.finishDate ? x.finishDate.valueOf() : null;
+      newProcessDto.jobSchema = x.jobSchema;
+      newProcessDto.location = x.location;
+      newProcessDto.bonus = x.bonus;
+      newProcessDto.salaryRange = x.salaryRange;
+      newProcessDto.stockOptions = x.stockOptions;
+      newProcessDto.techStack = x.techStack;
+      newProcessDto.timeOff = x.timeOff;
+      newProcessDto.amountOfSteps = x.steps.length;
+
+      return newProcessDto;
+    })
+
+
+    return {
+      metadata: {
+        size: count
+      },
+      processes: processesDto
+    };
+  }
+
+  async findOne(id: string) {
     const process = await this.processesRepository.findOneBy({ id });
 
     const newProcessDto = new GetProcessDto();
